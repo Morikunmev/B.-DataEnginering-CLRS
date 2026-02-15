@@ -1,0 +1,35 @@
+name: Convertir DOCX a PDF
+
+on:
+  push:
+    paths:
+      - '**/*.docx'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v3
+      
+      - name: Instalar LibreOffice
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice
+      
+      - name: Convertir DOCX a PDF
+        run: |
+          find . -name "*.docx" -type f | while read docx_file; do
+            dir=$(dirname "$docx_file")
+            libreoffice --headless --convert-to pdf --outdir "$dir" "$docx_file"
+            echo "✅ Convertido: $docx_file"
+          done
+      
+      - name: Commit PDFs generados
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add "**/*.pdf" || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "📄 Auto-generado: PDFs desde DOCX"
+          git push
