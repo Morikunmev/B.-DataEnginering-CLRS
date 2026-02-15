@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**/*.docx'
+  workflow_dispatch:  # ← AGREGAR ESTA LÍNEA (permite ejecutar manualmente)
 
 jobs:
   convert:
